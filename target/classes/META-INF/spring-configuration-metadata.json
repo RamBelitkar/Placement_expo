@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "appwrite",
+      "type": "com.placement.expo.config.AppwriteConfig",
+      "sourceType": "com.placement.expo.config.AppwriteConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "appwrite.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "com.placement.expo.config.AppwriteConfig"
+    },
+    {
+      "name": "appwrite.project-id",
+      "type": "java.lang.String",
+      "sourceType": "com.placement.expo.config.AppwriteConfig"
+    }
+  ],
+  "hints": []
+}
