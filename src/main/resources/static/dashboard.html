@@ -3,147 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Placement Expo</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Profile Dashboard - PlacementSyncer</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/appwrite@11.0.0"></script>
+    <script src="js/appwrite-config.js"></script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <header>
-            <h1>Welcome to Placement Expo</h1>
-            <div class="user-info">
-                <span id="userEmail"></span>
-                <button onclick="logout()">Logout</button>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>PlacementSyncer</h1>
             </div>
-        </header>
-        
-        <main>
-            <section class="profile-section">
-                <h2>Your Profile</h2>
-                <div id="profileInfo">
-                    Loading...
+            <div class="nav-user">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-info">
+                    <span class="user-name" id="userName">Loading...</span>
+                    <span class="user-email" id="userEmail">Loading...</span>
                 </div>
-            </section>
-            
-            <section class="jobs-section">
-                <h2>Latest Jobs</h2>
-                <div id="jobsList">
-                    Loading...
-                </div>
-            </section>
-        </main>
-    </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
 
-    <script src="js/appwrite-config.js"></script>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Header -->
+            <section class="dashboard-header">
+                <h1>Welcome Back!</h1>
+                <p>Here's your profile overview and recent activity</p>
+            </section>
+
+            <!-- Profile Summary Cards -->
+            <section class="summary-cards">
+                <div class="card profile-card">
+                    <div class="card-header">
+                        <h3>👤 Profile Overview</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="stat">
+                            <span class="stat-number">85</span>
+                            <span class="stat-label">Profile Score</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">42</span>
+                            <span class="stat-label">Profile Views</span>
+                        </div>
+                        <p class="card-description">Your profile is 85% complete. Add more skills to improve visibility.</p>
+                    </div>
+                </div>
+
+                <div class="card applications-card">
+                    <div class="card-header">
+                        <h3>💼 Job Applications</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="stat">
+                            <span class="stat-number">12</span>
+                            <span class="stat-label">Total Applied</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">3</span>
+                            <span class="stat-label">Interviews</span>
+                        </div>
+                        <p class="card-description">3 new job matches available based on your profile.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Details -->
+            <section class="profile-details">
+                <div class="details-card">
+                    <h3>Personal Information</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <label>Full Name</label>
+                            <span id="profileName">Loading...</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Email</label>
+                            <span id="profileEmail">Loading...</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Phone</label>
+                            <span id="profilePhone">+91 98765 43210</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Location</label>
+                            <span id="profileLocation">Pune, Maharashtra</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Department</label>
+                            <span id="profileDepartment">Computer Science</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Year</label>
+                            <span id="profileYear">Final Year</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recommended Jobs -->
+            <section class="recommended-jobs">
+                <h3>🎯 Recommended Jobs</h3>
+                <div class="jobs-list">
+                    <div class="job-card">
+                        <div class="job-header">
+                            <h4>Senior Frontend Developer</h4>
+                            <span class="job-status status-open">Open</span>
+                        </div>
+                        <p class="job-company">TechCorp • Remote • $80k-$120k</p>
+                        <div class="job-actions">
+                            <button class="btn btn-primary">Apply Now</button>
+                            <button class="btn btn-secondary">Save</button>
+                        </div>
+                    </div>
+
+                    <div class="job-card">
+                        <div class="job-header">
+                            <h4>Full Stack Engineer</h4>
+                            <span class="job-status status-applied">Applied</span>
+                        </div>
+                        <p class="job-company">StartupXYZ • San Francisco • $90k-$130k</p>
+                        <div class="job-actions">
+                            <button class="btn btn-secondary">View Application</button>
+                            <button class="btn btn-secondary">Withdraw</button>
+                        </div>
+                    </div>
+
+                    <div class="job-card">
+                        <div class="job-header">
+                            <h4>React Developer</h4>
+                            <span class="job-status status-interview">Interview</span>
+                        </div>
+                        <p class="job-company">InnovateLabs • New York • $75k-$110k</p>
+                        <div class="job-actions">
+                            <button class="btn btn-success">Schedule Interview</button>
+                            <button class="btn btn-secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <h3>📈 Recent Activity</h3>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">✅</div>
+                        <div class="activity-content">
+                            <h4>Application Submitted</h4>
+                            <p>Applied to Senior Frontend Developer at TechCorp</p>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">👁️</div>
+                        <div class="activity-content">
+                            <h4>Profile Viewed</h4>
+                            <p>Your profile was viewed by 5 recruiters this week</p>
+                            <span class="activity-time">1 day ago</span>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">🎯</div>
+                        <div class="activity-content">
+                            <h4>New Job Match</h4>
+                            <p>3 new jobs match your skills and preferences</p>
+                            <span class="activity-time">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
     <script>
-        // Check if we're being redirected in a loop
-        function checkRedirectLoop() {
-            const redirectCount = sessionStorage.getItem('redirectCount') || 0;
-            if (redirectCount > 2) {
-                sessionStorage.removeItem('redirectCount');
-                return true;
+        // Session Management and Authentication
+        let currentUser = null;
+        let sessionData = null;
+
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            try {
+                // Check if session data exists in localStorage
+                const storedSessionData = localStorage.getItem('sessionData');
+                
+                if (!storedSessionData) {
+                    console.log('No session data found, redirecting to login');
+                    redirectToLogin();
+                    return false;
+                }
+
+                sessionData = JSON.parse(storedSessionData);
+                
+                // Verify session with Appwrite
+                try {
+                    currentUser = await account.get();
+                    console.log('Session verified with Appwrite:', currentUser);
+                    
+                    // Update session data with fresh info
+                    sessionData = {
+                        ...sessionData,
+                        userName: currentUser.name || currentUser.email.split('@')[0],
+                        userEmail: currentUser.email,
+                        lastActivity: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('sessionData', JSON.stringify(sessionData));
+                    return true;
+                    
+                } catch (sessionError) {
+                    console.warn('Session verification failed:', sessionError);
+                    
+                    // If session is expired, clear data and redirect
+                    if (sessionError.code === 401 || sessionError.message?.includes('401')) {
+                        console.log('Session expired, clearing data and redirecting');
+                        clearSessionData();
+                        redirectToLogin();
+                        return false;
+                    }
+                    
+                    // For other errors, try to use stored data
+                    console.log('Using stored session data due to network/server issues');
+                    return true;
+                }
+                
+            } catch (error) {
+                console.error('Auth check error:', error);
+                clearSessionData();
+                redirectToLogin();
+                return false;
             }
-            sessionStorage.setItem('redirectCount', Number(redirectCount) + 1);
-            return false;
         }
 
-        // On page load
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Reset redirect counter if this is a direct access
-            if (document.referrer === '') {
-                sessionStorage.removeItem('redirectCount');
+        // Update UI with user data
+        function updateUserInterface() {
+            if (!sessionData) return;
+
+            // Update navigation
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userAvatar = document.getElementById('userAvatar');
+
+            if (userName) userName.textContent = sessionData.userName || 'User';
+            if (userEmail) userEmail.textContent = sessionData.userEmail || 'user@example.com';
+            if (userAvatar) {
+                const firstLetter = (sessionData.userName || sessionData.userEmail || 'U').charAt(0).toUpperCase();
+                userAvatar.textContent = firstLetter;
             }
-            checkAuth();
+
+            // Update profile details
+            const profileName = document.getElementById('profileName');
+            const profileEmail = document.getElementById('profileEmail');
+
+            if (profileName) profileName.textContent = sessionData.userName || 'User';
+            if (profileEmail) profileEmail.textContent = sessionData.userEmail || 'user@example.com';
+
+            // Update welcome message
+            const welcomeHeader = document.querySelector('.dashboard-header h1');
+            if (welcomeHeader) {
+                const firstName = (sessionData.userName || 'User').split(' ')[0];
+                welcomeHeader.textContent = `Welcome Back, ${firstName}!`;
+            }
+
+            console.log('UI updated with user data:', sessionData);
+        }
+
+        // Logout functionality
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    // Show loading state
+                    const logoutBtn = document.querySelector('.logout-btn');
+                    const originalText = logoutBtn.textContent;
+                    logoutBtn.textContent = 'Logging out...';
+                    logoutBtn.disabled = true;
+
+                    // Try to delete session from Appwrite
+                    try {
+                        await account.deleteSession('current');
+                        console.log('Session deleted from Appwrite');
+                    } catch (deleteError) {
+                        console.warn('Could not delete session from server:', deleteError);
+                        // Continue with local cleanup even if server deletion fails
+                    }
+
+                    // Clear local session data
+                    clearSessionData();
+
+                    // Redirect to login
+                    window.location.href = 'login.html';
+
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('Logout failed. Please try again.');
+                    
+                    // Reset button state
+                    const logoutBtn = document.querySelector('.logout-btn');
+                    logoutBtn.textContent = 'Logout';
+                    logoutBtn.disabled = false;
+                }
+            }
+        }
+
+        // Clear all session data
+        function clearSessionData() {
+            localStorage.removeItem('sessionData');
+            localStorage.removeItem('sessionId');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('loginTime');
+            sessionData = null;
+            currentUser = null;
+        }
+
+        // Redirect to login page
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        // Update last activity timestamp
+        function updateLastActivity() {
+            if (sessionData) {
+                sessionData.lastActivity = new Date().toISOString();
+                localStorage.setItem('sessionData', JSON.stringify(sessionData));
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Dashboard initializing...');
+
+            // Check authentication first
+            const isAuthenticated = await checkAuthStatus();
+            
+            if (!isAuthenticated) {
+                return; // Will redirect to login
+            }
+
+            // Update UI with user data
+            updateUserInterface();
+
+            // Add activity tracking
+            document.addEventListener('click', updateLastActivity);
+            document.addEventListener('keypress', updateLastActivity);
+
+            // Add interactivity to cards
+            const cards = document.querySelectorAll('.card, .job-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Set up periodic session validation (every 5 minutes)
+            setInterval(async () => {
+                try {
+                    await account.get();
+                    updateLastActivity();
+                } catch (error) {
+                    console.warn('Periodic session check failed:', error);
+                    if (error.code === 401 || error.message?.includes('401')) {
+                        alert('Your session has expired. Please login again.');
+                        clearSessionData();
+                        redirectToLogin();
+                    }
+                }
+            }, 5 * 60 * 1000); // 5 minutes
+
+            console.log('Dashboard loaded successfully');
         });
 
-        // Check authentication
-        async function checkAuth() {
-            try {
-                const user = await account.get();
-                if (!user) {
-                    throw new Error('No user found');
-                }
-                
-                // Reset redirect counter on successful auth
-                sessionStorage.removeItem('redirectCount');
-                
-                document.getElementById('userEmail').textContent = user.email;
-                loadProfile(user);
-            } catch (error) {
-                console.error('Authentication error:', error);
-                if (!checkRedirectLoop()) {
-                    window.location.href = 'login.html';
-                } else {
-                    // If we detect a redirect loop, clear everything and show error
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    document.body.innerHTML = `
-                        <div class="error-container">
-                            <h2>Authentication Error</h2>
-                            <p>Please <a href="login.html">click here</a> to log in again.</p>
-                        </div>
-                    `;
-                }
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Page became visible, update activity
+                updateLastActivity();
             }
-        }
-
-        // Load user profile
-        async function loadProfile(user) {
-            try {
-                document.getElementById('profileInfo').innerHTML = `
-                    <div class="profile-details">
-                        <p><strong>Email:</strong> ${user.email}</p>
-                        <p><strong>Status:</strong> Active</p>
-                        <p><strong>Last Login:</strong> ${new Date().toLocaleString()}</p>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                document.getElementById('profileInfo').innerHTML = 'Error loading profile';
-            }
-        }
-
-        // Load jobs
-        async function loadJobs() {
-            try {
-                const response = await fetch('/api/v1/jobs?status=OPEN');
-                const jobs = await response.json();
-                
-                document.getElementById('jobsList').innerHTML = jobs.content
-                    .map(job => `
-                        <div class="job-card">
-                            <h3>${job.title}</h3>
-                            <p><strong>Company:</strong> ${job.company}</p>
-                            <p><strong>Location:</strong> ${job.location}</p>
-                            <p><strong>Type:</strong> ${job.type}</p>
-                            <button onclick="viewJob(${job.id})">View Details</button>
-                        </div>
-                    `)
-                    .join('');
-            } catch (error) {
-                console.error('Error loading jobs:', error);
-            }
-        }
-
-        // Logout function
-        async function logout() {
-            try {
-                await account.deleteSession('current');
-                localStorage.clear();
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.error('Error during logout:', error);
-            }
-        }
-
-        // View job details
-        function viewJob(id) {
-            // Implement job details view
-            alert('Job details view not implemented yet');
-        }
-
-        // Check authentication on page load
-        checkAuth();
+        });
     </script>
 </body>
 </html>
