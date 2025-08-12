@@ -1,0 +1,36 @@
+package com.placement.expo.repository;
+
+import com.placement.expo.entity.PlacementStatistics;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface PlacementStatisticsRepository extends JpaRepository<PlacementStatistics, Long> {
+    
+    // Find by user profile
+    Optional<PlacementStatistics> findByUserProfileId(Long userProfileId);
+    
+    // Find by placement status
+    List<PlacementStatistics> findByPlacementStatus(PlacementStatistics.PlacementStatus placementStatus);
+    
+    // Statistics queries
+    @Query("SELECT ps.placementStatus, COUNT(ps) FROM PlacementStatistics ps GROUP BY ps.placementStatus")
+    List<Object[]> getPlacementStatusDistribution();
+    
+    @Query("SELECT AVG(ps.successRate) FROM PlacementStatistics ps WHERE ps.successRate > 0")
+    java.math.BigDecimal getAverageSuccessRate();
+    
+    @Query("SELECT AVG(ps.profileScore) FROM PlacementStatistics ps WHERE ps.profileScore > 0")
+    Double getAverageProfileScore();
+    
+    @Query("SELECT ps FROM PlacementStatistics ps WHERE ps.profileScore >= :minScore ORDER BY ps.profileScore DESC")
+    List<PlacementStatistics> findTopPerformers(@Param("minScore") Integer minScore);
+    
+    @Query("SELECT ps FROM PlacementStatistics ps ORDER BY ps.highestPackageOffered DESC LIMIT 10")
+    List<PlacementStatistics> findTopPackageHolders();
+}

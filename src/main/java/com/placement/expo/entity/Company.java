@@ -1,0 +1,129 @@
+package com.placement.expo.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "companies")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Company {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    // Company Information
+    @Column(name = "company_name", nullable = false, unique = true, length = 200)
+    private String companyName;
+    
+    @Column(name = "company_description", columnDefinition = "TEXT")
+    private String companyDescription;
+    
+    @Column(name = "industry", length = 100)
+    private String industry;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "company_size")
+    private CompanySize companySize;
+    
+    // Contact Information
+    @Column(name = "website", length = 500)
+    private String website;
+    
+    @Column(name = "headquarters_location", length = 200)
+    private String headquartersLocation;
+    
+    @Column(name = "hr_email", length = 100)
+    private String hrEmail;
+    
+    @Column(name = "hr_phone", length = 20)
+    private String hrPhone;
+    
+    // Recruitment Info
+    @Column(name = "campus_recruitment")
+    @Builder.Default
+    private Boolean campusRecruitment = true;
+    
+    @Column(name = "min_cgpa_requirement", precision = 4, scale = 2)
+    private BigDecimal minCgpaRequirement;
+    
+    @Column(name = "allowed_backlogs")
+    @Builder.Default
+    private Integer allowedBacklogs = 0;
+    
+    // Company Stats
+    @Column(name = "average_package", precision = 12, scale = 2)
+    private BigDecimal averagePackage;
+    
+    @Column(name = "highest_package", precision = 12, scale = 2)
+    private BigDecimal highestPackage;
+    
+    @Column(name = "total_openings")
+    @Builder.Default
+    private Integer totalOpenings = 0;
+    
+    // Status
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    @Column(name = "is_verified")
+    @Builder.Default
+    private Boolean isVerified = false;
+    
+    // Metadata
+    @Column(name = "logo_url", length = 500)
+    private String logoUrl;
+    
+    // Timestamps
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    // Relationships
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<JobApplication> jobApplications;
+    
+    // Enums
+    public enum CompanySize {
+        STARTUP, SMALL, MEDIUM, LARGE, ENTERPRISE
+    }
+    
+    // Utility methods
+    public String getDisplayName() {
+        return companyName + " (" + (companySize != null ? companySize.toString().toLowerCase() : "unknown size") + ")";
+    }
+    
+    public boolean isEligibleForStudent(UserProfile student) {
+        // Temporarily disabled due to compilation errors with UserProfile entity
+        /* if (minCgpaRequirement != null && student.getCurrentCgpa() != null) {
+            if (student.getCurrentCgpa().compareTo(minCgpaRequirement) < 0) {
+                return false;
+            }
+        }
+        
+        if (allowedBacklogs != null && student.getBacklogs() != null) {
+            if (student.getBacklogs() > allowedBacklogs) {
+                return false;
+            }
+        } */
+        
+        return Boolean.TRUE.equals(isActive);
+    }
+}

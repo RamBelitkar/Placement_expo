@@ -30,14 +30,24 @@ public class SecurityConfig {
                 "/index.html",
                 "/login.html",
                 "/register.html",
-                "/dashboard.html",  // Allow access to dashboard
-                "/test.html",       // Allow access to test page
+                "/registration.html",  // Add registration page
+                "/dashboard.html",     // Allow access to dashboard
+                "/jobs.html",          // Add jobs page
+                "/applications.html",  // Add applications page
+                "/test.html",          // Allow access to test page
                 "/css/**",
                 "/js/**",
                 "/images/**",
                 "/favicon.ico",     // Allow access to favicon
                 "/actuator/**",
                 "/api/v1/auth/**",
+                "/api/v1/profile-simple/**",  // Allow access to simplified profile API
+                "/api/v1/jobs/**",            // Allow access to jobs API
+                "/api/v1/applications/**",    // Allow access to applications API
+                "/api/v1/upload/**",          // Allow access to file upload API
+                "/api/v1/ats/**",             // Allow access to ATS analysis API
+                "/uploads/**",                // Allow access to uploaded files
+                "/h2-console/**",             // Allow access to H2 console
                 "/error"  // Allow access to error page
             ).permitAll()
             .anyRequest().authenticated()
@@ -46,7 +56,10 @@ public class SecurityConfig {
             .frameOptions().sameOrigin()  // Allow iframe for same origin
             .contentSecurityPolicy("default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://nyc.cloud.appwrite.io https://*.appwrite.io")
             .and()
-            .httpStrictTransportSecurity(hstsConfig -> hstsConfig.maxAgeInSeconds(31536000).includeSubDomains(true));
+            .httpStrictTransportSecurity(hstsConfig -> 
+                hstsConfig
+                    .maxAgeInSeconds(31536000)
+                    .includeSubDomains(true));
 
         return http.build();
     }
@@ -54,11 +67,23 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://192.168.1.11:8080",
-            "http://localhost:8080",
-            "http://127.0.0.1:8080"
-        ));
+        
+        // Get allowed origins from environment variable or use default for development
+        String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+        if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
+            configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        } else {
+            // Development defaults
+            configuration.setAllowedOrigins(Arrays.asList(
+                "http://192.168.1.11:8080",
+                "http://192.168.1.11:8081",
+                "http://localhost:8080",
+                "http://localhost:8081",
+                "http://127.0.0.1:8080",
+                "http://127.0.0.1:8081"
+            ));
+        }
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization",
@@ -66,9 +91,12 @@ public class SecurityConfig {
             "Content-Type",
             "Origin",
             "X-Requested-With",
-            "Accept"
+            "Accept",
+            "X-Appwrite-User-Id",      // Add Appwrite headers
+            "X-Appwrite-User-Email"    // Add Appwrite headers
         ));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache preflight response for 1 hour
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

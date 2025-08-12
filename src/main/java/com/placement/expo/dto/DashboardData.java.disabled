@@ -1,0 +1,303 @@
+package com.placement.expo.dto;
+
+import com.placement.expo.entity.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+// Temporarily disabled due to compilation errors with UserProfile entity
+/* @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder */
+public class DashboardData {
+    
+    // User Profile Information
+    private UserProfileSummary userProfile;
+    
+    // Statistics
+    private PlacementStatisticsSummary statistics;
+    
+    // Recent Activity
+    private List<JobApplicationSummary> recentApplications;
+    private List<SkillSummary> topSkills;
+    private List<ProjectSummary> featuredProjects;
+    
+    // Profile Metrics
+    private Integer profileCompletionPercentage;
+    private Integer profileScore;
+    private Long profileViews;
+    
+    // Placement Metrics
+    private Integer totalApplications;
+    private Integer pendingApplications;
+    private Integer interviewsScheduled;
+    private Integer offersReceived;
+    private BigDecimal successRate;
+    private BigDecimal highestPackageOffered;
+    
+    // Recent Activity Summary
+    private List<ActivityItem> recentActivity;
+    
+    @Data
+    @Builder
+    public static class UserProfileSummary {
+        private String firstName;
+        private String lastName;
+        private String fullName;
+        private String email; // From Appwrite
+        private String profilePictureUrl;
+        private String department;
+        private String course;
+        private Integer currentYear;
+        private BigDecimal currentCgpa;
+        
+        public static UserProfileSummary from(UserProfile profile, String email) {
+            return UserProfileSummary.builder()
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
+                .fullName(profile.getFullName())
+                .email(email)
+                .profilePictureUrl(profile.getProfilePictureUrl())
+                .department(profile.getDepartment())
+                .course(profile.getCourse())
+                .currentYear(profile.getCurrentYear())
+                .currentCgpa(profile.getCurrentCgpa())
+                .build();
+        }
+    }
+    
+    @Data
+    @Builder
+    public static class PlacementStatisticsSummary {
+        private Integer totalApplications;
+        private Integer applicationsPending;
+        private Integer applicationsRejected;
+        private Integer interviewsAttended;
+        private Integer offersReceived;
+        private BigDecimal successRate;
+        private BigDecimal highestPackageOffered;
+        private String placementStatus;
+        private Integer profileScore;
+        private Long profileViews;
+        
+        public static PlacementStatisticsSummary from(PlacementStatistics stats) {
+            return PlacementStatisticsSummary.builder()
+                .totalApplications(stats.getTotalApplications())
+                .applicationsPending(stats.getApplicationsPending())
+                .applicationsRejected(stats.getApplicationsRejected())
+                .interviewsAttended(stats.getInterviewsAttended())
+                .offersReceived(stats.getOffersReceived())
+                .successRate(stats.getSuccessRate())
+                .highestPackageOffered(stats.getHighestPackageOffered())
+                .placementStatus(stats.getPlacementStatusDisplay())
+                .profileScore(stats.getProfileScore())
+                .profileViews(stats.getProfileViews().longValue())
+                .build();
+        }
+    }
+    
+    @Data
+    @Builder
+    public static class JobApplicationSummary {
+        private Long id;
+        private String positionTitle;
+        private String companyName;
+        private String status;
+        private String statusColor;
+        private LocalDateTime applicationDate;
+        private LocalDateTime interviewDate;
+        private BigDecimal offeredPackage;
+        private String notes;
+        
+        public static JobApplicationSummary from(JobApplication application) {
+            return JobApplicationSummary.builder()
+                .id(application.getId())
+                .positionTitle(application.getPositionTitle())
+                .companyName(application.getCompany().getCompanyName())
+                .status(application.getStatus().toString())
+                .statusColor(application.getStatusColor())
+                .applicationDate(application.getApplicationDate())
+                .interviewDate(application.getInterviewDate())
+                .offeredPackage(application.getOfferedPackage())
+                .notes(application.getNotes())
+                .build();
+        }
+    }
+    
+    @Data
+    @Builder
+    public static class SkillSummary {
+        private Long id;
+        private String skillName;
+        private String skillCategory;
+        private String proficiencyLevel;
+        private Boolean isVerified;
+        private String yearsOfExperience;
+        
+        public static SkillSummary from(Skill skill) {
+            return SkillSummary.builder()
+                .id(skill.getId())
+                .skillName(skill.getSkillName())
+                .skillCategory(skill.getSkillCategory().toString())
+                .proficiencyLevel(skill.getProficiencyLevel().toString())
+                .isVerified(skill.getIsVerified())
+                .yearsOfExperience(skill.getYearsOfExperience() != null ? 
+                    skill.getYearsOfExperience().toString() + " years" : "0 years")
+                .build();
+        }
+    }
+    
+    @Data
+    @Builder
+    public static class ProjectSummary {
+        private Long id;
+        private String projectName;
+        private String projectType;
+        private String description;
+        private String technologiesUsed;
+        private String projectUrl;
+        private String githubUrl;
+        private Boolean isFeatured;
+        private String duration;
+        
+        public static ProjectSummary from(Project project) {
+            return ProjectSummary.builder()
+                .id(project.getId())
+                .projectName(project.getProjectName())
+                .projectType(project.getProjectType().toString())
+                .description(project.getDescription())
+                .technologiesUsed(project.getTechnologiesUsed())
+                .projectUrl(project.getProjectUrl())
+                .githubUrl(project.getGithubUrl())
+                .isFeatured(project.getIsFeatured())
+                .duration(project.getDurationString())
+                .build();
+        }
+    }
+    
+    @Data
+    @Builder
+    public static class ActivityItem {
+        private String type;
+        private String title;
+        private String description;
+        private String timestamp;
+        private String icon;
+        private String color;
+        
+        // Factory methods for different activity types
+        public static ActivityItem applicationSubmitted(JobApplication application) {
+            return ActivityItem.builder()
+                .type("APPLICATION")
+                .title("Application Submitted")
+                .description("Applied to " + application.getPositionTitle() + " at " + application.getCompany().getCompanyName())
+                .timestamp(application.getApplicationDate().toString())
+                .icon("✅")
+                .color("blue")
+                .build();
+        }
+        
+        public static ActivityItem interviewScheduled(JobApplication application) {
+            return ActivityItem.builder()
+                .type("INTERVIEW")
+                .title("Interview Scheduled")
+                .description("Interview for " + application.getPositionTitle() + " at " + application.getCompany().getCompanyName())
+                .timestamp(application.getInterviewDate().toString())
+                .icon("📅")
+                .color("orange")
+                .build();
+        }
+        
+        public static ActivityItem profileUpdated() {
+            return ActivityItem.builder()
+                .type("PROFILE")
+                .title("Profile Updated")
+                .description("Your profile information was updated")
+                .timestamp(LocalDateTime.now().toString())
+                .icon("👤")
+                .color("green")
+                .build();
+        }
+        
+        public static ActivityItem skillAdded(Skill skill) {
+            return ActivityItem.builder()
+                .type("SKILL")
+                .title("New Skill Added")
+                .description("Added " + skill.getSkillName() + " (" + skill.getProficiencyLevel().toString().toLowerCase() + ")")
+                .timestamp(skill.getCreatedAt().toString())
+                .icon("🎯")
+                .color("purple")
+                .build();
+        }
+    }
+    
+    // Factory method to create dashboard data
+    public static DashboardData create(UserProfile profile, String email, PlacementStatistics stats, 
+                                     List<JobApplication> applications, List<Skill> skills, 
+                                     List<Project> projects) {
+        
+        // Create summaries
+        UserProfileSummary profileSummary = UserProfileSummary.from(profile, email);
+        PlacementStatisticsSummary statsSummary = PlacementStatisticsSummary.from(stats);
+        
+        List<JobApplicationSummary> applicationSummaries = applications.stream()
+            .map(JobApplicationSummary::from)
+            .toList();
+        
+        List<SkillSummary> skillSummaries = skills.stream()
+            .limit(5) // Top 5 skills
+            .map(SkillSummary::from)
+            .toList();
+        
+        List<ProjectSummary> projectSummaries = projects.stream()
+            .limit(3) // Top 3 featured projects
+            .map(ProjectSummary::from)
+            .toList();
+        
+        // Create recent activity
+        List<ActivityItem> recentActivity = createRecentActivity(applications, skills);
+        
+        return DashboardData.builder()
+            .userProfile(profileSummary)
+            .statistics(statsSummary)
+            .recentApplications(applicationSummaries)
+            .topSkills(skillSummaries)
+            .featuredProjects(projectSummaries)
+            .profileCompletionPercentage(profile.getProfileCompletionPercentage())
+            .profileScore(stats.getProfileScore())
+            .profileViews(stats.getProfileViews().longValue())
+            .totalApplications(stats.getTotalApplications())
+            .pendingApplications(stats.getApplicationsPending())
+            .interviewsScheduled(stats.getInterviewsAttended())
+            .offersReceived(stats.getOffersReceived())
+            .successRate(stats.getSuccessRate())
+            .highestPackageOffered(stats.getHighestPackageOffered())
+            .recentActivity(recentActivity)
+            .build();
+    }
+    
+    private static List<ActivityItem> createRecentActivity(List<JobApplication> applications, List<Skill> skills) {
+        List<ActivityItem> activities = new java.util.ArrayList<>();
+        
+        // Add recent applications
+        applications.stream()
+            .limit(3)
+            .forEach(app -> activities.add(ActivityItem.applicationSubmitted(app)));
+        
+        // Add recent skills
+        skills.stream()
+            .limit(2)
+            .forEach(skill -> activities.add(ActivityItem.skillAdded(skill)));
+        
+        // Sort by timestamp (most recent first)
+        activities.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+        
+        return activities.stream().limit(5).toList();
+    }
+}

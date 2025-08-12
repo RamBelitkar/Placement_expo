@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Placement Expo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@11.0.0"></script>
+    <script src="js/appwrite-config.js"></script>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="auth-container glass slide-in-up">
+        <div class="auth-header">
+            <h1 class="gradient-text">Create Account</h1>
+            <p>Join Placement Expo and start your journey</p>
+        </div>
+
+        <form id="registerForm" class="slide-in-up">
+            <div class="form-group input-animated">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required placeholder="Enter your full name" class="glass">
+            </div>
+            <div class="form-group input-animated">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="Enter your email" class="glass">
+            </div>
+            <div class="form-group input-animated">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Create a password" class="glass">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-animated pulse">
+                <span>Create Account</span>
+            </button>
+
+            <div class="auth-links">
+                <p>Already have an account? <a href="login.html">Login here</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Utility function to clear sessions
+        async function clearExistingSessions() {
+            try {
+                const sessions = await account.listSessions();
+                if (sessions && sessions.sessions) {
+                    for (const session of sessions.sessions) {
+                        await account.deleteSession(session.$id);
+                    }
+                }
+            } catch (error) {
+                console.log('No active sessions to clear');
+            }
+        }
+
+        // Clean up Appwrite registration if something fails
+        async function cleanupRegistration(userId, sessionId) {
+            console.log('Starting cleanup for user:', userId);
+            
+            try {
+                // 1. Delete session if it exists
+                if (sessionId) {
+                    try {
+                        await account.deleteSession(sessionId);
+                        console.log('Session deleted successfully');
+                    } catch (e) {
+                        console.error('Failed to delete session:', e);
+                    }
+                }
+
+                // 2. Delete user if it exists
+                if (userId) {
+                    try {
+                        const response = await fetch(`/api/v1/auth/deleteUser/${userId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            console.log('User deleted successfully');
+                        } else {
+                            console.error('Failed to delete user:', await response.text());
+                        }
+                    } catch (e) {
+                        console.error('Failed to delete user:', e);
+                    }
+                }
+            } catch (error) {
+                console.error('Cleanup operation failed:', error);
+            }
+        }
+
+        // Initialize registration
+        document.addEventListener('DOMContentLoaded', async () => {
+            await clearExistingSessions();
+        });
+
+        // Handle registration
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            let createdUser = null;
+            let session = null;
+
+            try {
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // Step 1: Create user in Appwrite
+                console.log('Creating user in Appwrite...');
+                createdUser = await account.create('unique()', email, password, name);
+                console.log('User created successfully:', createdUser.$id);
+
+                // Step 2: Create session
+                console.log('Creating session...');
+                session = await account.createEmailSession(email, password);
+                console.log('Session created successfully:', session.$id);
+
+                // Step 3: Register in backend
+                console.log('Registering in backend...');
+                const backendResponse = await fetch('/api/v1/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.$id}`
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        appwriteId: createdUser.$id
+                    })
+                });
+
+                if (!backendResponse.ok) {
+                    const errorData = await backendResponse.json();
+                    throw new Error(errorData.message || 'Backend registration failed');
+                }
+
+                console.log('Backend registration successful');
+
+                // Step 4: Store session data
+                localStorage.setItem('sessionId', session.$id);
+                localStorage.setItem('userId', createdUser.$id);
+                localStorage.setItem('userEmail', email);
+
+                // Success - redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error('Registration failed:', error);
+
+                // Cleanup on failure
+                if (createdUser || session) {
+                    console.log('Starting cleanup process...');
+                    await cleanupRegistration(
+                        createdUser ? createdUser.$id : null,
+                        session ? session.$id : null
+                    );
+                }
+
+                // Show error to user
+                alert('Registration failed: ' + error.message + 
+                      '\nPlease try again or contact support if the problem persists.');
+            }
+        });
+    </script>
+</body>
+</html>

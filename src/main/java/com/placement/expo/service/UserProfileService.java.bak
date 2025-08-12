@@ -1,0 +1,286 @@
+package com.placement.expo.service;
+
+import com.placement.expo.dto.RegistrationRequest;
+import com.placement.expo.dto.UserProfileResponse;
+import com.placement.expo.dto.DashboardData;
+import com.placement.expo.entity.*;
+import com.placement.expo.repository.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
+public class UserProfileService {
+    
+    private final UserProfileRepository userProfileRepository;
+    private final AcademicRecordRepository academicRecordRepository;
+    private final SkillRepository skillRepository;
+    private final ProjectRepository projectRepository;
+    private final JobApplicationRepository jobApplicationRepository;
+    private final PlacementStatisticsRepository placementStatisticsRepository;
+    
+    /**
+     * Create or update user profile from registration
+     * This links Appwrite user with database profile
+     */
+    public UserProfile createOrUpdateProfile(String appwriteUserId, RegistrationRequest request) {
+        log.info("Creating/updating profile for Appwrite user: {}", appwriteUserId);
+        
+        Optional<UserProfile> existingProfile = userProfileRepository.findByAppwriteUserId(appwriteUserId);
+        
+        UserProfile profile;
+        if (existingProfile.isPresent()) {
+            profile = existingProfile.get();
+            log.info("Updating existing profile for user: {}", appwriteUserId);
+        } else {
+            profile = new UserProfile();
+            profile.setAppwriteUserId(appwriteUserId);
+            log.info("Creating new profile for user: {}", appwriteUserId);
+        }
+        
+        // Update basic information
+        updateBasicInformation(profile, request);
+        
+        // Save profile
+        profile = userProfileRepository.save(profile);
+        
+        // Create placement statistics if not exists
+        createPlacementStatisticsIfNotExists(profile);
+        
+        // Calculate and update profile completion
+        updateProfileCompletion(profile);
+        
+        log.info("Profile saved successfully for user: {} with ID: {}", appwriteUserId, profile.getId());
+        return profile;
+    }
+    
+    /**
+     * Get user profile by Appwrite User ID
+     */
+    @Transactional(readOnly = true)
+    public Optional<UserProfile> getProfileByAppwriteUserId(String appwriteUserId) {
+        return userProfileRepository.findByAppwriteUserId(appwriteUserId);
+    }
+    
+    /**
+     * Get complete dashboard data for user
+     */
+    @Transactional(readOnly = true)
+    public DashboardData getDashboardData(String appwriteUserId) {
+        log.info("Getting dashboard data for user: {}", appwriteUserId);
+        
+        UserProfile profile = userProfileRepository.findByAppwriteUserId(appwriteUserId)
+            .orElseThrow(() -> new RuntimeException("User profile not found"));
+        
+        // Get placement statistics
+        PlacementStatistics stats = placementStatisticsRepository
+            .findByUserProfileId(profile.getId())
+            .orElse(createDefaultPlacementStatistics(profile));
+        
+        // Get recent applications
+        List<JobApplication> recentApplications = jobApplicationRepository
+            .findByUserProfileIdAndApplicationDateAfterOrderByApplicationDateDesc(
+                profile.getId(), LocalDateTime.now().minusDays(30));
+        
+        // Get skills by category
+        List<Skill> technicalSkills = skillRepository
+            .findByUserProfileIdAndSkillCategory(profile.getId(), Skill.SkillCategory.TECHNICAL);
+        
+        // Get featured projects
+        List<Project> featuredProjects = projectRepository
+            .findByUserProfileIdAndIsFeaturedTrueOrderByDisplayOrderAsc(profile.getId());
+        
+        return DashboardData.builder()
+            .userProfile(profile)
+            .placementStatistics(stats)
+            .recentApplications(recentApplications)
+            .technicalSkills(technicalSkills)
+            .featuredProjects(featuredProjects)
+            .profileCompletionPercentage(calculateProfileCompletion(profile))
+            .build();
+    }
+    
+    /**
+     * Update profile completion percentage
+     */
+    public void updateProfileCompletion(UserProfile profile) {
+        int completionPercentage = calculateProfileCompletion(profile);
+        profile.setProfileCompletionPercentage(completionPercentage);
+        userProfileRepository.save(profile);
+        
+        // Update profile score in statistics
+        PlacementStatistics stats = placementStatisticsRepository
+            .findByUserProfileId(profile.getId())
+            .orElse(createDefaultPlacementStatistics(profile));
+        
+        stats.setProfileScore(completionPercentage);
+        placementStatisticsRepository.save(stats);
+    }
+    
+    /**
+     * Add academic record to profile
+     */
+    public AcademicRecord addAcademicRecord(String appwriteUserId, AcademicRecord academicRecord) {
+        UserProfile profile = userProfileRepository.findByAppwriteUserId(appwriteUserId)
+            .orElseThrow(() -> new RuntimeException("User profile not found"));
+        
+        academicRecord.setUserProfile(profile);
+        AcademicRecord saved = academicRecordRepository.save(academicRecord);
+        
+        // Update profile completion
+        updateProfileCompletion(profile);
+        
+        return saved;
+    }
+    
+    /**
+     * Add skill to profile
+     */
+    public Skill addSkill(String appwriteUserId, Skill skill) {
+        UserProfile profile = userProfileRepository.findByAppwriteUserId(appwriteUserId)
+            .orElseThrow(() -> new RuntimeException("User profile not found"));
+        
+        skill.setUserProfile(profile);
+        Skill saved = skillRepository.save(skill);
+        
+        // Update profile completion
+        updateProfileCompletion(profile);
+        
+        return saved;
+    }
+    
+    /**
+     * Add project to profile
+     */
+    public Project addProject(String appwriteUserId, Project project) {
+        UserProfile profile = userProfileRepository.findByAppwriteUserId(appwriteUserId)
+            .orElseThrow(() -> new RuntimeException("User profile not found"));
+        
+        project.setUserProfile(profile);
+        Project saved = projectRepository.save(project);
+        
+        // Update profile completion
+        updateProfileCompletion(profile);
+        
+        return saved;
+    }
+    
+    /**
+     * Check if user profile exists
+     */
+    @Transactional(readOnly = true)
+    public boolean profileExists(String appwriteUserId) {
+        return userProfileRepository.existsByAppwriteUserId(appwriteUserId);
+    }
+    
+    // Private helper methods
+    
+    private void updateBasicInformation(UserProfile profile, RegistrationRequest request) {
+        profile.setFirstName(request.getFirstName());
+        profile.setLastName(request.getLastName());
+        profile.setPhone(request.getPhone());
+        profile.setDateOfBirth(request.getDateOfBirth());
+        profile.setGender(request.getGender());
+        
+        // Contact Information
+        profile.setAddress(request.getAddress());
+        profile.setCity(request.getCity());
+        profile.setState(request.getState());
+        profile.setPincode(request.getPincode());
+        profile.setEmergencyContactName(request.getEmergencyContactName());
+        profile.setEmergencyContactPhone(request.getEmergencyContactPhone());
+        
+        // Academic Information
+        profile.setStudentId(request.getStudentId());
+        profile.setRollNumber(request.getRollNumber());
+        profile.setDepartment(request.getDepartment());
+        profile.setCourse(request.getCourse());
+        profile.setCurrentYear(request.getCurrentYear());
+        profile.setCurrentSemester(request.getCurrentSemester());
+        profile.setExpectedGraduationDate(request.getExpectedGraduationDate());
+        
+        // Academic Performance
+        profile.setCurrentCgpa(request.getCurrentCgpa());
+        profile.setCurrentPercentage(request.getCurrentPercentage());
+        profile.setBacklogs(request.getBacklogs());
+        
+        // Documents
+        profile.setResumeUrl(request.getResumeUrl());
+        profile.setLinkedinUrl(request.getLinkedinUrl());
+        profile.setGithubUrl(request.getGithubUrl());
+        profile.setPortfolioUrl(request.getPortfolioUrl());
+    }
+    
+    private int calculateProfileCompletion(UserProfile profile) {
+        int score = 0;
+        int totalFields = 20; // Adjust based on required fields
+        
+        // Basic Information (30%)
+        if (profile.getFirstName() != null) score++;
+        if (profile.getLastName() != null) score++;
+        if (profile.getPhone() != null) score++;
+        if (profile.getDateOfBirth() != null) score++;
+        if (profile.getAddress() != null) score++;
+        if (profile.getCity() != null) score++;
+        
+        // Academic Information (40%)
+        if (profile.getStudentId() != null) score++;
+        if (profile.getRollNumber() != null) score++;
+        if (profile.getDepartment() != null) score++;
+        if (profile.getCourse() != null) score++;
+        if (profile.getCurrentYear() != null) score++;
+        if (profile.getCurrentCgpa() != null) score++;
+        if (profile.getExpectedGraduationDate() != null) score++;
+        
+        // Documents and Links (30%)
+        if (profile.getResumeUrl() != null) score++;
+        if (profile.getLinkedinUrl() != null) score++;
+        if (profile.getGithubUrl() != null) score++;
+        
+        // Additional sections
+        long skillsCount = skillRepository.findByUserProfileIdOrderBySkillCategoryAscProficiencyLevelDesc(profile.getId()).size();
+        if (skillsCount >= 3) score++; // At least 3 skills
+        
+        long projectsCount = projectRepository.findByUserProfileIdOrderByDisplayOrderAscCreatedAtDesc(profile.getId()).size();
+        if (projectsCount >= 1) score++; // At least 1 project
+        
+        long academicRecordsCount = academicRecordRepository.findByUserProfileIdOrderByEducationLevelAsc(profile.getId()).size();
+        if (academicRecordsCount >= 2) score++; // At least 2 academic records (12th + current)
+        
+        if (profile.getProfilePictureUrl() != null) score++;
+        
+        return Math.min((score * 100) / totalFields, 100);
+    }
+    
+    private void createPlacementStatisticsIfNotExists(UserProfile profile) {
+        if (!placementStatisticsRepository.findByUserProfileId(profile.getId()).isPresent()) {
+            PlacementStatistics stats = createDefaultPlacementStatistics(profile);
+            placementStatisticsRepository.save(stats);
+        }
+    }
+    
+    private PlacementStatistics createDefaultPlacementStatistics(UserProfile profile) {
+        return PlacementStatistics.builder()
+            .userProfile(profile)
+            .totalApplications(0)
+            .applicationsPending(0)
+            .applicationsRejected(0)
+            .interviewsAttended(0)
+            .offersReceived(0)
+            .profileViews(0)
+            .profileScore(0)
+            .successRate(BigDecimal.ZERO)
+            .placementStatus(PlacementStatistics.PlacementStatus.SEEKING)
+            .lastActivityDate(LocalDateTime.now())
+            .build();
+    }
+}

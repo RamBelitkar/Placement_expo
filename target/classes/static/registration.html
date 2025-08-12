@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - PlacementSyncer</title>
+    <link rel="stylesheet" href="/css/registration.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@11.0.0"></script>
+    <script src="js/appwrite-config.js"></script>
+    <script src="js/resume-upload.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>PlacementSyncer</h1>
+            </div>
+            <div class="nav-user">
+                <span class="user-email" id="userEmail">Loading...</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Header -->
+            <section class="registration-header">
+                <h1>Complete Your Profile</h1>
+                <p>Fill in your details to get started with PlacementSyncer</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="progress-text" id="progressText">0% Complete</span>
+            </section>
+
+            <!-- Registration Form -->
+            <form id="registrationForm" class="registration-form">
+                
+                <!-- Step 1: Personal Information -->
+                <div class="form-step active" id="step1">
+                    <h2>📋 Personal Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth">
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender">
+                                <option value="">Select Gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact Information -->
+                <div class="form-step" id="step2">
+                    <h2>🏠 Contact Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="address">Address</label>
+                            <textarea id="address" name="address" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state">
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">Pincode</label>
+                            <input type="text" id="pincode" name="pincode">
+                        </div>
+                        <div class="form-group">
+                            <label for="emergencyContactName">Emergency Contact Name</label>
+                            <input type="text" id="emergencyContactName" name="emergencyContactName">
+                        </div>
+                        <div class="form-group">
+                            <label for="emergencyContactPhone">Emergency Contact Phone</label>
+                            <input type="tel" id="emergencyContactPhone" name="emergencyContactPhone">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Academic Information -->
+                <div class="form-step" id="step3">
+                    <h2>🎓 Academic Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="studentId">Student ID *</label>
+                            <input type="text" id="studentId" name="studentId" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="rollNumber">Roll Number *</label>
+                            <input type="text" id="rollNumber" name="rollNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="department">Department *</label>
+                            <select id="department" name="department" required>
+                                <option value="">Select Department</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Civil">Civil</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Chemical">Chemical</option>
+                                <option value="Biotechnology">Biotechnology</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="course">Course *</label>
+                            <select id="course" name="course" required>
+                                <option value="">Select Course</option>
+                                <option value="B.Tech">B.Tech</option>
+                                <option value="B.E">B.E</option>
+                                <option value="M.Tech">M.Tech</option>
+                                <option value="M.E">M.E</option>
+                                <option value="MCA">MCA</option>
+                                <option value="MBA">MBA</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentYear">Current Year *</label>
+                            <select id="currentYear" name="currentYear" required>
+                                <option value="">Select Year</option>
+                                <option value="1">First Year</option>
+                                <option value="2">Second Year</option>
+                                <option value="3">Third Year</option>
+                                <option value="4">Fourth Year</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentSemester">Current Semester *</label>
+                            <select id="currentSemester" name="currentSemester" required>
+                                <option value="">Select Semester</option>
+                                <option value="1">1st Semester</option>
+                                <option value="2">2nd Semester</option>
+                                <option value="3">3rd Semester</option>
+                                <option value="4">4th Semester</option>
+                                <option value="5">5th Semester</option>
+                                <option value="6">6th Semester</option>
+                                <option value="7">7th Semester</option>
+                                <option value="8">8th Semester</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expectedGraduationDate">Expected Graduation Date</label>
+                            <input type="date" id="expectedGraduationDate" name="expectedGraduationDate">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Academic Performance -->
+                <div class="form-step" id="step4">
+                    <h2>📊 Academic Performance</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="currentCgpa">Current CGPA</label>
+                            <input type="number" id="currentCgpa" name="currentCgpa" 
+                                   min="0" max="10" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="currentPercentage">Current Percentage</label>
+                            <input type="number" id="currentPercentage" name="currentPercentage" 
+                                   min="0" max="100" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="backlogs">Number of Backlogs</label>
+                            <input type="number" id="backlogs" name="backlogs" 
+                                   min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Documents & Links -->
+                <div class="form-step" id="step5">
+                    <h2>📎 Documents & Professional Links</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="resumeUpload">Upload Resume (PDF, DOC, DOCX - Max 5MB)</label>
+                            <input type="file" id="resumeUpload" name="resumeUpload" 
+                                   accept=".pdf,.doc,.docx" class="file-input">
+                            <div class="file-upload-hint">
+                                <span>📁 Choose file or drag and drop</span>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="resumeUrl">Or provide Resume URL</label>
+                            <input type="url" id="resumeUrl" name="resumeUrl" 
+                                   placeholder="https://drive.google.com/... (if you prefer a link)">
+                        </div>
+                        <div class="form-group">
+                            <label for="linkedinUrl">LinkedIn Profile</label>
+                            <input type="url" id="linkedinUrl" name="linkedinUrl" 
+                                   placeholder="https://linkedin.com/in/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="githubUrl">GitHub Profile</label>
+                            <input type="url" id="githubUrl" name="githubUrl" 
+                                   placeholder="https://github.com/...">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="portfolioUrl">Portfolio URL</label>
+                            <input type="url" id="portfolioUrl" name="portfolioUrl" 
+                                   placeholder="https://yourportfolio.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Preferences -->
+                <div class="form-step" id="step6">
+                    <h2>🎯 Job Preferences</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="salaryExpectations">Salary Expectations (INR)</label>
+                            <input type="number" id="salaryExpectations" name="salaryExpectations" 
+                                   min="0" step="1000" placeholder="300000">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Preferred Job Types</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" name="jobTypes" value="Full-time"> Full-time</label>
+                                <label><input type="checkbox" name="jobTypes" value="Internship"> Internship</label>
+                                <label><input type="checkbox" name="jobTypes" value="Part-time"> Part-time</label>
+                                <label><input type="checkbox" name="jobTypes" value="Remote"> Remote</label>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Preferred Locations</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" name="locations" value="Mumbai"> Mumbai</label>
+                                <label><input type="checkbox" name="locations" value="Bangalore"> Bangalore</label>
+                                <label><input type="checkbox" name="locations" value="Pune"> Pune</label>
+                                <label><input type="checkbox" name="locations" value="Delhi"> Delhi</label>
+                                <label><input type="checkbox" name="locations" value="Hyderabad"> Hyderabad</label>
+                                <label><input type="checkbox" name="locations" value="Chennai"> Chennai</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="form-navigation">
+                    <button type="button" id="prevBtn" onclick="changeStep(-1)">Previous</button>
+                    <button type="button" id="nextBtn" onclick="changeStep(1)">Next</button>
+                    <button type="submit" id="submitBtn" style="display: none;">Complete Registration</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Saving your profile...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global Variables
+        let currentStep = 1;
+        let totalSteps = 6;
+        let currentUser = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Registration page initializing...');
+            
+            // Check authentication
+            const isAuthenticated = await checkAuthStatus();
+            if (!isAuthenticated) {
+                return; // Will redirect to login
+            }
+
+            // Check if profile already exists
+            await checkExistingProfile();
+            
+            // Initialize form
+            updateStepDisplay();
+            updateProgress();
+            
+            console.log('Registration page loaded successfully');
+        });
+
+        // Authentication check
+        async function checkAuthStatus() {
+            try {
+                currentUser = await account.get();
+                console.log('User authenticated:', currentUser);
+                
+                // Update UI with user email
+                document.getElementById('userEmail').textContent = currentUser.email;
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                alert('Please login first to access this page.');
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        // Check if profile already exists
+        async function checkExistingProfile() {
+            try {
+                const response = await fetch('/api/v1/profile-simple/exists', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Appwrite-User-Id': currentUser.$id,
+                        'X-Appwrite-User-Email': currentUser.email
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.data.exists) {
+                    if (confirm('You already have a profile. Do you want to go to dashboard instead?')) {
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                }
+                
+            } catch (error) {
+                console.warn('Could not check existing profile:', error);
+            }
+        }
+
+        // Step Navigation
+        function changeStep(direction) {
+            if (direction === 1 && !validateCurrentStep()) {
+                return;
+            }
+
+            currentStep += direction;
+            
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > totalSteps) currentStep = totalSteps;
+            
+            updateStepDisplay();
+            updateProgress();
+        }
+
+        function updateStepDisplay() {
+            // Hide all steps
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show current step
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'inline-block';
+            document.getElementById('nextBtn').style.display = currentStep === totalSteps ? 'none' : 'inline-block';
+            document.getElementById('submitBtn').style.display = currentStep === totalSteps ? 'inline-block' : 'none';
+        }
+
+        function updateProgress() {
+            const progressPercentage = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progressPercentage + '%';
+            document.getElementById('progressText').textContent = Math.round(progressPercentage) + '% Complete';
+        }
+
+        // Validation
+        function validateCurrentStep() {
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            const requiredFields = currentStepElement.querySelectorAll('[required]');
+            
+            for (let field of requiredFields) {
+                if (!field.value.trim()) {
+                    field.focus();
+                    alert(`Please fill in the ${field.labels[0].textContent.replace(' *', '')} field.`);
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Form Submission
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateCurrentStep()) {
+                return;
+            }
+
+            await submitRegistration();
+        });
+
+        async function submitRegistration() {
+            try {
+                showLoading(true);
+                
+                // Collect form data
+                const formData = collectFormData();
+                
+                // Add comprehensive debugging
+                console.log('=== REGISTRATION DEBUG START ===');
+                console.log('Current user:', currentUser);
+                console.log('Form data collected:', formData);
+                
+                // Validate required fields for the API
+                const requiredFields = ['firstName', 'lastName', 'department', 'currentYear'];
+                const missingFields = requiredFields.filter(field => !formData[field]);
+                
+                if (missingFields.length > 0) {
+                    console.error('Missing required fields:', missingFields);
+                    throw new Error('Please fill all required fields: ' + missingFields.join(', '));
+                }
+                
+                console.log('All required fields present. Submitting to backend...');
+                
+                // Handle resume file upload first if provided
+                const resumeFile = document.getElementById('resumeUpload').files[0];
+                let resumeUploadResult = null;
+                
+                if (resumeFile) {
+                    console.log('Resume file selected for upload:', resumeFile.name);
+                    
+                    try {
+                        // Upload the resume file - this will also trigger ATS analysis
+                        resumeUploadResult = await handleResumeUpload(resumeFile, currentUser.$id);
+                        
+                        if (resumeUploadResult) {
+                            // Set the file URL in form data
+                            formData.resumeUrl = resumeUploadResult.fileUrl;
+                            console.log('Resume uploaded successfully, URL:', formData.resumeUrl);
+                            console.log('ATS Score:', resumeUploadResult.atsScore);
+                        }
+                    } catch (uploadError) {
+                        console.error('Resume upload failed:', uploadError);
+                        // Continue with registration even if resume upload fails
+                    }
+                } else {
+                    console.log('No resume file selected for upload');
+                }
+                
+                // Submit profile data to backend
+                console.log('Sending registration request with headers:', {
+                    'Content-Type': 'application/json',
+                    'X-Appwrite-User-Id': currentUser.$id,
+                    'X-Appwrite-User-Email': currentUser.email
+                });
+                console.log('Request body:', JSON.stringify(formData, null, 2));
+                
+                const response = await fetch('/api/v1/profile-simple/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Appwrite-User-Id': currentUser.$id,
+                        'X-Appwrite-User-Email': currentUser.email
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response error:', errorText);
+                    let errorData;
+                    try {
+                        errorData = JSON.parse(errorText);
+                    } catch (e) {
+                        throw new Error(`Server error (${response.status}): ${errorText || response.statusText}`);
+                    }
+                    throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('Registration response:', result);
+                
+                if (result.success) {
+                    console.log('✅ Registration successful!');
+                    
+                    // If resume was uploaded but no ATS analysis was done through the upload endpoint,
+                    // perform direct ATS analysis
+                    if (resumeFile && (!resumeUploadResult || !resumeUploadResult.atsScore)) {
+                        console.log('Performing direct ATS analysis on uploaded resume');
+                        try {
+                            const analysisResult = await analyzeResume(resumeFile, currentUser.$id);
+                            if (analysisResult) {
+                                console.log('ATS analysis completed:', analysisResult.overallScore);
+                            }
+                        } catch (analysisError) {
+                            console.warn('ATS analysis failed:', analysisError);
+                        }
+                    }
+                
+                    // Create session data for dashboard
+                    const sessionData = {
+                        userId: currentUser.$id,
+                        userName: formData.firstName + ' ' + formData.lastName,
+                        userEmail: currentUser.email,
+                        loginTime: new Date().toISOString(),
+                        lastActivity: new Date().toISOString(),
+                        profileComplete: true
+                    };
+                    
+                    localStorage.setItem('sessionData', JSON.stringify(sessionData));
+                    console.log('Session data created:', sessionData);
+                    
+                    alert('Registration completed successfully!');
+                    console.log('Redirecting to dashboard...');
+                    window.location.href = 'dashboard.html';
+                    
+                } else {
+                    console.error('Registration failed with message:', result.message);
+                    throw new Error(result.message || 'Registration failed');
+                }
+                
+            } catch (error) {
+                console.error('=== REGISTRATION ERROR ===');
+                console.error('Registration submission error:', error);
+                console.error('Error details:', error.stack);
+                alert('Registration failed: ' + error.message);
+                
+            } finally {
+                console.log('=== REGISTRATION DEBUG END ===');
+                showLoading(false);
+            }
+        }
+
+        function collectFormData() {
+            const form = document.getElementById('registrationForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            // Basic form fields
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    // Handle multiple values (checkboxes)
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // Only include fields that the backend expects and handles
+            const backendExpectedData = {};
+            
+            // Required fields for backend
+            backendExpectedData.firstName = data.firstName || '';
+            backendExpectedData.lastName = data.lastName || '';
+            backendExpectedData.phone = data.phone || '';
+            backendExpectedData.department = data.department || document.querySelector('#department')?.value || 'Computer Science';
+            
+            // Convert numeric fields properly
+            backendExpectedData.currentYear = data.currentYear ? parseInt(data.currentYear) : 1;
+            backendExpectedData.currentCgpa = data.currentCgpa ? parseFloat(data.currentCgpa) : 0.0;
+            backendExpectedData.backlogs = data.backlogs ? parseInt(data.backlogs) : 0;
+            
+            // Optional URL fields
+            if (data.linkedinUrl) backendExpectedData.linkedinUrl = data.linkedinUrl;
+            if (data.githubUrl) backendExpectedData.githubUrl = data.githubUrl;
+            if (data.portfolioUrl) backendExpectedData.portfolioUrl = data.portfolioUrl;
+            
+            // Resume URL will be set after upload if applicable
+            // Don't include fields that backend doesn't handle yet like:
+            // - jobPreferences, locationPreferences (these can be added later)
+            // - currentSemester, currentPercentage, salaryExpectations
+            // - address, city, state, etc. (not in backend entity yet)
+            
+            console.log('=== FORM DATA COLLECTION ===');
+            console.log('Raw form data:', data);
+            console.log('Backend expected data:', backendExpectedData);
+            
+            return backendExpectedData;
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        async function logout() {
+            if (confirm('Are you sure you want to logout? Your registration progress will be lost.')) {
+                try {
+                    await account.deleteSession('current');
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    // Force logout locally
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                if (currentStep < totalSteps) {
+                    changeStep(1);
+                } else {
+                    document.getElementById('submitBtn').click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+2025-08-12 11:50:32 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]\\x\000d\000aSELECT \000d\000a    id,\000d\000a    appwrite_user_id,\000d\000a    first_name,\000d\000a    last_name,\000d\000a    email,\000d\000a    phone,\000d\000a    department,\000d\000a    current_year,\000d\000a    current_cgpa,\000d\000a    backlogs,\000d\000a    linkedin_url,\000d\000a    github_url,\000d\000a    portfolio_url,\000d\000a    resume_url,\000d\000a    ats_score,\000d\000a    ats_feedback,\000d\000a    profile_completion_percentage,\000d\000a    is_profile_verified,\000d\000a    created_at,\000d\000a    updated_at\000d\000aFROM user_profiles_simple \000d\000aWHERE email = 'ram27belitkar@gmail.com'"; SQL statement:
+\x
+SELECT 
+    id,
+    appwrite_user_id,
+    first_name,
+    last_name,
+    email,
+    phone,
+    department,
+    current_year,
+    current_cgpa,
+    backlogs,
+    linkedin_url,
+    github_url,
+    portfolio_url,
+    resume_url,
+    ats_score,
+    ats_feedback,
+    profile_completion_percentage,
+    is_profile_verified,
+    created_at,
+    updated_at
+FROM user_profiles_simple 
+WHERE email = 'ram27belitkar@gmail.com' [42000-214]

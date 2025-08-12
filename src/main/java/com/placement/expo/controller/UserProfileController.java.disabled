@@ -1,0 +1,226 @@
+package com.placement.expo.controller;
+
+import com.placement.expo.dto.DashboardData;
+import com.placement.expo.dto.RegistrationRequest;
+import com.placement.expo.dto.UserProfileResponse;
+import com.placement.expo.entity.*;
+import com.placement.expo.service.UserProfileService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+// Temporarily disabled due to compilation errors
+/* @RestController
+@RequestMapping("/api/v1/profile")
+@RequiredArgsConstructor
+@Slf4j
+@CrossOrigin(origins = "*", maxAge = 3600) */
+public class UserProfileController {
+    
+    private final UserProfileService userProfileService;
+    
+    /**
+     * Create or update user profile (hybrid registration)
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> registerProfile(
+            @RequestHeader("X-Appwrite-User-Id") String appwriteUserId,
+            @RequestBody RegistrationRequest request) {
+        
+        try {
+            log.info("Registration request for Appwrite user: {}", appwriteUserId);
+            
+            // Validate basic required fields
+            if (!request.isBasicInfoComplete()) {
+                return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, "Basic information is incomplete"));
+            }
+            
+            UserProfile profile = userProfileService.createOrUpdateProfile(appwriteUserId, request);
+            UserProfileResponse response = UserProfileResponse.from(profile);
+            
+            return ResponseEntity.ok(new ApiResponse(true, "Profile saved successfully", response));
+            
+        } catch (Exception e) {
+            log.error("Error during profile registration: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Registration failed: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Get user profile by Appwrite user ID
+     */
+    @GetMapping
+    public ResponseEntity<?> getProfile(@RequestHeader("X-Appwrite-User-Id") String appwriteUserId) {
+        try {
+            Optional<UserProfile> profile = userProfileService.getProfileByAppwriteUserId(appwriteUserId);
+            
+            if (profile.isPresent()) {
+                UserProfileResponse response = UserProfileResponse.from(profile.get());
+                return ResponseEntity.ok(new ApiResponse(true, "Profile found", response));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(false, "Profile not found"));
+            }
+            
+        } catch (Exception e) {
+            log.error("Error fetching profile: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to fetch profile"));
+        }
+    }
+    
+    /**
+     * Check if profile exists
+     */
+    @GetMapping("/exists")
+    public ResponseEntity<?> checkProfileExists(@RequestHeader("X-Appwrite-User-Id") String appwriteUserId) {
+        try {
+            boolean exists = userProfileService.profileExists(appwriteUserId);
+            return ResponseEntity.ok(new ApiResponse(true, "Profile existence checked", 
+                java.util.Map.of("exists", exists)));
+                
+        } catch (Exception e) {
+            log.error("Error checking profile existence: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to check profile existence"));
+        }
+    }
+    
+    /**
+     * Get dashboard data (hybrid approach)
+     */
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> getDashboardData(
+            @RequestHeader("X-Appwrite-User-Id") String appwriteUserId,
+            @RequestHeader(value = "X-Appwrite-User-Email", required = false) String userEmail) {
+        
+        try {
+            log.info("Dashboard data request for user: {}", appwriteUserId);
+            
+            DashboardData dashboardData = userProfileService.getDashboardData(appwriteUserId);
+            
+            // Set email from Appwrite if available
+            if (userEmail != null && dashboardData.getUserProfile() != null) {
+                dashboardData.getUserProfile().setEmail(userEmail);
+            }
+            
+            return ResponseEntity.ok(new ApiResponse(true, "Dashboard data fetched", dashboardData));
+            
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(false, "User profile not found. Please complete registration first."));
+            }
+            log.error("Error fetching dashboard data: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to fetch dashboard data"));
+                
+        } catch (Exception e) {
+            log.error("Unexpected error fetching dashboard data: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to fetch dashboard data"));
+        }
+    }
+    
+    /**
+     * Add academic record
+     */
+    @PostMapping("/academic-record")
+    public ResponseEntity<?> addAcademicRecord(
+            @RequestHeader("X-Appwrite-User-Id") String appwriteUserId,
+            @RequestBody AcademicRecord academicRecord) {
+        
+        try {
+            AcademicRecord saved = userProfileService.addAcademicRecord(appwriteUserId, academicRecord);
+            return ResponseEntity.ok(new ApiResponse(true, "Academic record added", saved));
+            
+        } catch (Exception e) {
+            log.error("Error adding academic record: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to add academic record"));
+        }
+    }
+    
+    /**
+     * Add skill
+     */
+    @PostMapping("/skill")
+    public ResponseEntity<?> addSkill(
+            @RequestHeader("X-Appwrite-User-Id") String appwriteUserId,
+            @RequestBody Skill skill) {
+        
+        try {
+            Skill saved = userProfileService.addSkill(appwriteUserId, skill);
+            return ResponseEntity.ok(new ApiResponse(true, "Skill added", saved));
+            
+        } catch (Exception e) {
+            log.error("Error adding skill: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to add skill"));
+        }
+    }
+    
+    /**
+     * Add project
+     */
+    @PostMapping("/project")
+    public ResponseEntity<?> addProject(
+            @RequestHeader("X-Appwrite-User-Id") String appwriteUserId,
+            @RequestBody Project project) {
+        
+        try {
+            Project saved = userProfileService.addProject(appwriteUserId, project);
+            return ResponseEntity.ok(new ApiResponse(true, "Project added", saved));
+            
+        } catch (Exception e) {
+            log.error("Error adding project: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to add project"));
+        }
+    }
+    
+    /**
+     * Update profile completion
+     */
+    @PostMapping("/update-completion")
+    public ResponseEntity<?> updateProfileCompletion(@RequestHeader("X-Appwrite-User-Id") String appwriteUserId) {
+        try {
+            Optional<UserProfile> profileOpt = userProfileService.getProfileByAppwriteUserId(appwriteUserId);
+            
+            if (profileOpt.isPresent()) {
+                userProfileService.updateProfileCompletion(profileOpt.get());
+                return ResponseEntity.ok(new ApiResponse(true, "Profile completion updated"));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(false, "Profile not found"));
+            }
+            
+        } catch (Exception e) {
+            log.error("Error updating profile completion: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(false, "Failed to update profile completion"));
+        }
+    }
+    
+    // Generic API Response class
+    @lombok.Data
+    @lombok.AllArgsConstructor
+    @lombok.NoArgsConstructor
+    public static class ApiResponse {
+        private boolean success;
+        private String message;
+        private Object data;
+        
+        public ApiResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+    }
+}

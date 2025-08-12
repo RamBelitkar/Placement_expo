@@ -1,0 +1,100 @@
+package com.placement.expo.dto;
+
+import com.placement.expo.entity.UserProfile;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserProfileResponse {
+    
+    private Long id;
+    private String appwriteUserId;
+    
+    // Personal Information
+    private String firstName;
+    private String lastName;
+    private String fullName;
+    private String phone;
+    private LocalDate dateOfBirth;
+    private UserProfile.Gender gender;
+    private String profilePictureUrl;
+    
+    // Contact Information
+    private String address;
+    private String city;
+    private String state;
+    private String pincode;
+    
+    // Academic Information
+    private String studentId;
+    private String rollNumber;
+    private String department;
+    private String course;
+    private Integer currentYear;
+    private Integer currentSemester;
+    private LocalDate expectedGraduationDate;
+    
+    // Academic Performance
+    private BigDecimal currentCgpa;
+    private BigDecimal currentPercentage;
+    private Integer backlogs;
+    
+    // Documents
+    private String resumeUrl;
+    private String portfolioUrl;
+    private String linkedinUrl;
+    private String githubUrl;
+    
+    // Profile Status
+    private Integer profileCompletionPercentage;
+    private Boolean isProfileVerified;
+    
+    // Metadata
+    private String createdAt;
+    private String updatedAt;
+    
+    // Static factory method
+    public static UserProfileResponse from(UserProfile profile) {
+        return UserProfileResponse.builder()
+            .id(profile.getId())
+            .appwriteUserId(profile.getAppwriteUserId())
+            .firstName(profile.getFirstName())
+            .lastName(profile.getLastName())
+            .fullName(profile.getFullName())
+            .phone(profile.getPhone())
+            .dateOfBirth(profile.getDateOfBirth())
+            .gender(profile.getGender())
+            .profilePictureUrl(profile.getProfilePictureUrl())
+            .address(profile.getAddress())
+            .city(profile.getCity())
+            .state(profile.getState())
+            .pincode(profile.getPincode())
+            .studentId(profile.getStudentId())
+            .rollNumber(profile.getRollNumber())
+            .department(profile.getDepartment())
+            .course(profile.getCourse())
+            .currentYear(profile.getCurrentYear())
+            .currentSemester(profile.getCurrentSemester())
+            .expectedGraduationDate(profile.getExpectedGraduationDate())
+            .currentCgpa(profile.getCurrentCgpa())
+            .currentPercentage(profile.getCurrentPercentage())
+            .backlogs(profile.getBacklogs())
+            .resumeUrl(profile.getResumeUrl())
+            .portfolioUrl(profile.getPortfolioUrl())
+            .linkedinUrl(profile.getLinkedinUrl())
+            .githubUrl(profile.getGithubUrl())
+            .profileCompletionPercentage(profile.getProfileCompletionPercentage())
+            .isProfileVerified(profile.getIsProfileVerified())
+            .createdAt(profile.getCreatedAt() != null ? profile.getCreatedAt().toString() : null)
+            .updatedAt(profile.getUpdatedAt() != null ? profile.getUpdatedAt().toString() : null)
+            .build();
+    }
+}
