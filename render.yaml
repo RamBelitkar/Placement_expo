@@ -13,13 +13,21 @@ services:
     startCommand: java -Dserver.port=$PORT -jar target/placement_expo-0.0.1-SNAPSHOT.jar
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: production
+        value: render
       - key: UPLOAD_DIR
         value: /tmp/uploads
       - key: CORS_ALLOWED_ORIGINS
         value: "*"
       - key: JAVA_TOOL_OPTIONS
         value: "-Xmx512m"
+      - key: APPWRITE_ENDPOINT
+        value: https://nyc.cloud.appwrite.io/v1
+      - key: APPWRITE_PROJECT_ID
+        value: 6894d20300386b659e32
+      - key: DATABASE_URL
+        value: postgresql://placement_expo_db_user:G8nDOIOGqqYqboucqX3C3sLy04xFho4C@dpg-d2dmdg3uibrs739scu3g-a.oregon-postgres.render.com/placement_expo_db
+      - key: JWT_SECRET
+        value: placement-expo-jwt-secret-key-very-long-and-secure-for-production-use-minimum-256-bits
 
 databases:
   - name: placement-db
