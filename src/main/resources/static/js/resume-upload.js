@@ -35,6 +35,12 @@ async function handleResumeUpload(file, appwriteUserId) {
         // Show loading indicator
         showMessage('Uploading resume and analyzing...', 'info');
         
+        // Update UI to show processing state
+        const atsScoreElement = document.getElementById('atsScoreValue');
+        if (atsScoreElement) {
+            atsScoreElement.textContent = '...';
+        }
+        
         // Create form data for file upload
         const formData = new FormData();
         formData.append('file', file);
@@ -46,7 +52,8 @@ async function handleResumeUpload(file, appwriteUserId) {
         const response = await fetch('/api/v1/upload/resume', {
             method: 'POST',
             headers: {
-                'X-Appwrite-User-Id': appwriteUserId
+                'X-Appwrite-User-Id': appwriteUserId,
+                'Accept': 'application/json'
             },
             body: formData
         });
