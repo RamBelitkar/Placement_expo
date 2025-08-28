@@ -29,8 +29,5 @@ services:
       - key: JWT_SECRET
         value: placement-expo-jwt-secret-key-very-long-and-secure-for-production-use-minimum-256-bits
 
-databases:
-  - name: placement-db
-    databaseName: placement_expo
-    user: placement_user
-    plan: free
+# External Database Configuration
+# Using existing PostgreSQL database from the DATABASE_URL environment variable
