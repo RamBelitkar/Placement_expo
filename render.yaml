@@ -9,8 +9,11 @@ services:
       source "$HOME/.sdkman/bin/sdkman-init.sh"
       sdk install java 17.0.2-open
       sdk install maven
-      mvn clean package -DskipTests
-    startCommand: java -Dserver.port=$PORT -Dspring.profiles.active=render -jar target/placement_expo-0.0.1-SNAPSHOT.jar
+      # Build with production profile
+      mvn clean package -DskipTests -Dspring.profiles.active=render
+    startCommand: java -Xmx512m -Dserver.port=$PORT -Dspring.profiles.active=render -jar target/expo-0.0.1-SNAPSHOT.jar
+    healthCheckPath: /actuator/health
+    numInstances: 1
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: render
@@ -31,8 +34,9 @@ services:
       # Spring Boot Configuration
       - key: SERVER_PORT
         value: ${PORT}
+      # Database Configuration
       - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://dpg-d2dmdg3uibrs739scu3g-a.oregon-postgres.render.com:5432/placement_expo_db
+        value: postgresql://dpg-d2dmdg3uibrs739scu3g-a.oregon-postgres.render.com:5432/placement_expo_db
       - key: SPRING_DATASOURCE_USERNAME
         value: placement_expo_db_user
       - key: SPRING_DATASOURCE_PASSWORD
