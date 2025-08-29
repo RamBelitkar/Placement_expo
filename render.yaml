@@ -10,7 +10,7 @@ services:
       sdk install java 17.0.2-open
       sdk install maven
       mvn clean package -DskipTests
-    startCommand: java -Dserver.port=$PORT -jar target/placement_expo-0.0.1-SNAPSHOT.jar
+    startCommand: java -Dserver.port=$PORT -Dspring.profiles.active=render -jar target/placement_expo-0.0.1-SNAPSHOT.jar
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: render
@@ -24,10 +24,26 @@ services:
         value: https://nyc.cloud.appwrite.io/v1
       - key: APPWRITE_PROJECT_ID
         value: 6894d20300386b659e32
-      - key: DATABASE_URL
-        value: postgresql://placement_expo_db_user:G8nDOIOGqqYqboucqX3C3sLy04xFho4C@dpg-d2dmdg3uibrs739scu3g-a.oregon-postgres.render.com/placement_expo_db
+
       - key: JWT_SECRET
         value: placement-expo-jwt-secret-key-very-long-and-secure-for-production-use-minimum-256-bits
 
-# External Database Configuration
-# Using existing PostgreSQL database from the DATABASE_URL environment variable
+      # Spring Boot Configuration
+      - key: SERVER_PORT
+        value: ${PORT}
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://dpg-d2dmdg3uibrs739scu3g-a.oregon-postgres.render.com:5432/placement_expo_db
+      - key: SPRING_DATASOURCE_USERNAME
+        value: placement_expo_db_user
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: G8nDOIOGqqYqboucqX3C3sLy04xFho4C
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: SPRING_JPA_SHOW_SQL
+        value: "false"
+      - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "2"
